@@ -7,13 +7,21 @@ import (
 	"time"
 )
 
+//iServer 接口实现，定义一个Server服务类
 type Server struct {
-	Name      string
+	//服务器的名称
+	Name string
+	//tcp4 or other
 	IPVersion string
-	IP        string
-	Port      int
+	//服务绑定的IP地址
+	IP string
+	//服务绑定的端口
+	Port int
 }
 
+//============== 实现 ziface.IServer 里的全部接口方法 ========
+
+//开启网络服务
 func (s *Server) Start() {
 	fmt.Printf("[START] Server listen at IP: %s, Port %d is starting\n", s.IP, s.Port)
 
@@ -85,10 +93,13 @@ func (s *Server) Serve() {
 
 	//阻塞,否则主Go退出， listenner的go将会退出
 	for {
-		time.Sleep(10*time.Second)
+		time.Sleep(10 * time.Second)
 	}
 }
 
+/*
+  创建一个服务器句柄
+*/
 func NewServer(name string) ziface.IServer {
 	s := &Server{
 		Name:      name,
