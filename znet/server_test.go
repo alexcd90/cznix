@@ -33,17 +33,23 @@ func ClientTest() {
 
 		fmt.Printf(" server call back : %s, cnt = %d\n", buf, cnt)
 
-		time.Sleep(1*time.Second)
+		time.Sleep(1 * time.Second)
 	}
 }
 
-func TestServer_Serve(t *testing.T) {
+func TestServer(t *testing.T) {
 
-	//1
+	/*
+		服务端测试
+	*/
+	//1 创建一个server 句柄 s
 	s := NewServer("[zinx V0.1]")
 
+	/*
+		客户端测试
+	*/
 	go ClientTest()
 
-	//2
+	//2 开启服务
 	s.Serve()
 }
