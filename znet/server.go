@@ -1,7 +1,6 @@
 package znet
 
 import (
-	"errors"
 	"fmt"
 	"github.com/alexcd90/czinx/ziface"
 	"net"
@@ -20,17 +19,6 @@ type Server struct {
 	Port int
 	//当前Server由用户绑定的回调router,也就是Server注册的链接对应的处理业务
 	Router ziface.IRouter
-}
-
-//============== 定义当前客户端链接的handle api ===========
-func CallBackToClient(conn *net.TCPConn, data []byte, cnt int) error {
-	// 回显业务
-	fmt.Println("[Conn Handle] CallBackToClient ... ")
-	if _, err := conn.Write(data[:cnt]); err != nil {
-		fmt.Println("write back buf err ", err)
-		return errors.New("CallBackToClient error")
-	}
-	return nil
 }
 
 //============== 实现 ziface.IServer 里的全部接口方法 ========
