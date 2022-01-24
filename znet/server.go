@@ -1,7 +1,6 @@
 package znet
 
 import (
-	"errors"
 	"fmt"
 	"github.com/alexcd90/czinx/ziface"
 	"net"
@@ -18,17 +17,8 @@ type Server struct {
 	IP string
 	//服务绑定的端口
 	Port int
-}
-
-//============== 定义当前客户端链接的handle api ===========
-func CallBackToClient(conn *net.TCPConn, data []byte, cnt int) error {
-	// 回显业务
-	fmt.Println("[Conn Handle] CallBackToClient ... ")
-	if _, err := conn.Write(data[:cnt]); err != nil {
-		fmt.Println("write back buf err ", err)
-		return errors.New("CallBackToClient error")
-	}
-	return nil
+	//当前Server由用户绑定的回调router,也就是Server注册的链接对应的处理业务
+	Router ziface.IRouter
 }
 
 //============== 实现 ziface.IServer 里的全部接口方法 ========
@@ -72,7 +62,7 @@ func (s *Server) Start() {
 			//3.2 TODO Server.Start() 设置服务器最大连接控制，如果超过最大连接，那么关闭此新的连接
 
 			//3.3 TODO Server.Start() 处理该新连接请求的业务方法，此时应该有handler和conn是绑定的
-			dealConn := NewConnection(conn, cid, CallBackToClient)
+			dealConn := NewConnection(conn, cid, s.Router)
 			cid++
 
 			//3.4 启动当前连接的处理业务
@@ -99,6 +89,12 @@ func (s *Server) Serve() {
 	}
 }
 
+//路由功能：给当前服务注册一个路由业务方法，供客户端链接处理使用
+func (s *Server) AddRouter(router ziface.IRouter) {
+	s.Router = router
+	fmt.Println("Add Router success !")
+}
+
 /*
   创建一个服务器句柄
 */
@@ -108,6 +104,7 @@ func NewServer(name string) ziface.IServer {
 		IPVersion: "tcp4",
 		IP:        "0.0.0.0",
 		Port:      8888,
+		Router:    nil,
 	}
 
 	return s
