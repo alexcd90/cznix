@@ -18,8 +18,8 @@ type Server struct {
 	IP string
 	//服务绑定的端口
 	Port int
-	//当前Server由用户绑定的回调router,也就是Server注册的链接对应的处理业务
-	Router ziface.IRouter
+	//当前Server的消息管理模块，用来绑定MsgId和对应的处理方法
+	msgHandler ziface.IMsgHandle
 }
 
 //============== 实现 ziface.IServer 里的全部接口方法 ========
@@ -67,7 +67,7 @@ func (s *Server) Start() {
 			//3.2 TODO Server.Start() 设置服务器最大连接控制，如果超过最大连接，那么关闭此新的连接
 
 			//3.3 TODO Server.Start() 处理该新连接请求的业务方法，此时应该有handler和conn是绑定的
-			dealConn := NewConnection(conn, cid, s.Router)
+			dealConn := NewConnection(conn, cid, s.msgHandler)
 			cid++
 
 			//3.4 启动当前连接的处理业务
@@ -95,9 +95,8 @@ func (s *Server) Serve() {
 }
 
 //路由功能：给当前服务注册一个路由业务方法，供客户端链接处理使用
-func (s *Server) AddRouter(router ziface.IRouter) {
-	s.Router = router
-	fmt.Println("Add Router success !")
+func (s *Server) AddRouter(msgId uint32, router ziface.IRouter) {
+	s.msgHandler.AddRouter(msgId, router)
 }
 
 /*
@@ -108,11 +107,11 @@ func NewServer() ziface.IServer {
 	utils.GlobalObject.Reload()
 
 	s := &Server{
-		Name:      utils.GlobalObject.Name, //从全局参数获取
-		IPVersion: "tcp4",
-		IP:        utils.GlobalObject.Host,    //从全局参数获取
-		Port:      utils.GlobalObject.TcpPort, //从全局参数获取
-		Router:    nil,
+		Name:       utils.GlobalObject.Name, //从全局参数获取
+		IPVersion:  "tcp4",
+		IP:         utils.GlobalObject.Host,    //从全局参数获取
+		Port:       utils.GlobalObject.TcpPort, //从全局参数获取
+		msgHandler: NewMsgHandle(),             //msgHandler 初始化
 	}
 
 	return s
