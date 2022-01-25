@@ -43,7 +43,7 @@ func TestServer(t *testing.T) {
 		服务端测试
 	*/
 	//1 创建一个server 句柄 s
-	s := NewServer("[zinx V0.1]")
+	s := NewServer()
 
 	/*
 		客户端测试
