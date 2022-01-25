@@ -3,6 +3,7 @@ package znet
 import (
 	"errors"
 	"fmt"
+	"github.com/alexcd90/czinx/utils"
 	"github.com/alexcd90/czinx/ziface"
 	"io"
 	"net"
@@ -41,7 +42,7 @@ func NewConnection(conn *net.TCPConn, connID uint32, msghandler ziface.IMsgHandl
 
 /* 处理conn读数据的Goroutine */
 func (c *Connection) StartReader() {
-	fmt.Println("Reader Goroutine is Running")
+	fmt.Println("[Reader Goroutine is Running]")
 	defer fmt.Println(c.RemoteAddr().String(), " conn reader exit!")
 	defer c.Stop()
 
@@ -81,8 +82,13 @@ func (c *Connection) StartReader() {
 			conn: c,
 			msg:  msg,
 		}
-		//从路由Routers 中找到注册绑定Conn的对应Handle
-		go c.MsgHandler.DoMsgHandler(&req)
+		if utils.GlobalObject.WorkerPoolSize > 0 {
+			c.MsgHandler.SendMsgToTaskQueue(&req)
+		} else {
+			//从路由Routers 中找到注册绑定Conn的对应Handle
+			go c.MsgHandler.DoMsgHandler(&req)
+		}
+
 	}
 }
 
