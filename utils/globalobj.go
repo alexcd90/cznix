@@ -25,6 +25,7 @@ type GlobalObj struct {
 	MaxConn          int    //当前服务器主机允许的最大链接个数
 	WorkerPoolSize   uint32 //业务工作Worker池的数量
 	MaxWorkerTaskLen uint32 //业务工作Worker对应负责的任务队列最大任务存储数量
+	MaxMsgChanLen    uint32 //SendBuffMsg发送消息的缓冲最大长度
 
 	/*
 		config file path
@@ -75,7 +76,7 @@ func init() {
 	//初始化GlobalObject变量，设置一些默认值
 	GlobalObject = &GlobalObj{
 		Name:             "ZinxServerApp",
-		Version:          "V0.8",
+		Version:          "V0.9",
 		TcpPort:          8888,
 		Host:             "0.0.0.0",
 		MaxConn:          12000,
@@ -83,6 +84,7 @@ func init() {
 		ConfFilePath:     "conf/zinx.json",
 		WorkerPoolSize:   10,
 		MaxWorkerTaskLen: 1024,
+		MaxMsgChanLen:    1024,
 	}
 
 	//从配置文件中加载一些用户配置的参数
