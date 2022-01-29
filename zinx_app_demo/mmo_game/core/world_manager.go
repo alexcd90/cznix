@@ -63,3 +63,19 @@ func (wm *WorldManager) GetAllPlayers() []*Player {
 
 	return players
 }
+
+//获取指定gID中的所有player信息
+func (wm *WorldManager) GetPlayersByGID(gID int) []*Player {
+	//通过gID获取 对应 格子中的所有pID
+	pIDs := wm.AoiMgr.grids[gID].GetPlyerIDs()
+
+	//通过pID找到对应的player对象
+	players := make([]*Player, 0, len(pIDs))
+	wm.PLock.RLock()
+	for _, pID := range pIDs {
+		players = append(players, wm.Players[int32(pID)])
+	}
+	wm.PLock.RUnlock()
+
+	return players
+}

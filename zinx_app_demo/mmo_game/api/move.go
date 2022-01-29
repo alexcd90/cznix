@@ -9,17 +9,17 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
-//世界聊天 路由业务
-type WorldChatApi struct {
+//玩家移动
+type MoveApi struct {
 	znet.BaseRouter
 }
 
-func (*WorldChatApi) Handle(request ziface.IRequest) {
+func (*MoveApi) Handle(request ziface.IRequest) {
 	//1. 将客户端传来的proto协议解码
-	msg := &pb.Talk{}
+	msg := &pb.Position{}
 	err := proto.Unmarshal(request.GetData(), msg)
 	if err != nil {
-		fmt.Println("Talk Unmarshal error ", err)
+		fmt.Println("Move: Position Unmarshal error ", err)
 		return
 	}
 
@@ -30,9 +30,11 @@ func (*WorldChatApi) Handle(request ziface.IRequest) {
 		request.GetConnection().Stop()
 		return
 	}
+
+	fmt.Printf("user pid = %d , move(%f,%f,%f,%f)", pid, msg.X, msg.Y, msg.Z, msg.V)
 	//3. 根据pid得到player对象
 	player := core.WorldMgrObj.Players[pid.(int32)]
 
-	//4. 让player对象发起聊天广播请求
-	player.Talk(msg.Content)
+	//4. 让player对象发起移动位置信息广播
+	player.UpdatePos(msg.X, msg.Y, msg.Z, msg.V)
 }

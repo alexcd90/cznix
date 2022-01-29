@@ -143,6 +143,11 @@ func (m *AOIManager) GetPidsByGid(gID int) (playerIDs []int) {
 	return
 }
 
+//移除一个格子中的PlayerID
+func (m *AOIManager) RemovePIDFromGrID(pID, gID int) {
+	m.grids[gID].Remove(pID)
+}
+
 //添加一个PlayerID到一个格子中
 func (m *AOIManager) AddPidToGrid(pID, gID int) {
 	m.grids[gID].Add(pID)
